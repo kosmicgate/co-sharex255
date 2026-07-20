@@ -1,4 +1,5 @@
-import { createWorker } from 'tesseract.js';
+import { createWorker, PSM } from 'tesseract.js';
+import { preprocessReceiptImage } from './imagePreprocess';
 
 export interface OcrLineItem {
   name: string;
@@ -12,8 +13,9 @@ const SKIP_KEYWORDS = [
   'discount', 'service charge', 'server', 'table', 'guest', 'thank',
 ];
 
-// Matches a line ending in a price like "Pad Thai 12.00" or "Iced Tea $3.00"
-const LINE_RE = /^(.+?)\s+\$?(\d+(?:\.\d{1,2})?)\s*$/;
+// Matches a line ending in a price like "Pad Thai 12.00", "Iced Tea $3.00",
+// or "4 Pillars shiraz 1,260.00" (thousands separator).
+const LINE_RE = /^(.+?)\s+\$?(\d{1,3}(?:,\d{3})*(?:\.\d{1,2})?)\s*$/;
 
 export function parseReceiptText(text: string): OcrLineItem[] {
   const lines = text.split('\n').map((l) => l.trim()).filter(Boolean);
@@ -27,8 +29,8 @@ export function parseReceiptText(text: string): OcrLineItem[] {
     if (!match) continue;
 
     let name = match[1].trim().replace(/^[-*•\d.\s]+/, '').trim();
-    const price = Number(match[2]);
-    if (!name || !Number.isFinite(price) || price <= 0 || price > 1000) continue;
+    const price = Number(match[2].replace(/,/g, ''));
+    if (!name || !Number.isFinite(price) || price <= 0 || price > 100000) continue;
 
     // strip a leading qty like "2x Iced Tea" or "2 Iced Tea"
     let qty = 1;
@@ -49,9 +51,14 @@ export function parseReceiptText(text: string): OcrLineItem[] {
 }
 
 export async function extractReceiptItems(file: File): Promise<OcrLineItem[]> {
+  const processed = await preprocessReceiptImage(file);
   const worker = await createWorker('eng');
   try {
-    const { data } = await worker.recognize(file);
+    // Receipts are effectively one column of text — telling Tesseract to
+    // treat the page as a single uniform block avoids it trying (and
+    // failing) to detect multi-column layout on a narrow strip of paper.
+    await worker.setParameters({ tessedit_pageseg_mode: PSM.SINGLE_BLOCK });
+    const { data } = await worker.recognize(processed);
     return parseReceiptText(data.text);
   } finally {
     await worker.terminate();
