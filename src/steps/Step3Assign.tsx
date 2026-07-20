@@ -14,6 +14,7 @@ export function Step3Assign({ bill }: { bill: BillStateApi }) {
       <ItemSelector
         items={bill.items}
         activeItemId={activeItem?.id ?? null}
+        invalidItemIds={bill.invalidItemIds}
         onSelect={bill.setActiveItemId}
       />
       <AssignDetail

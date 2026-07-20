@@ -10,6 +10,7 @@ export const colors = {
   orange: '#dd8a3a',
   orangeLight: '#f3dcae',
   teal: '#2f7d6e',
+  red: '#b3382c',
 } as const;
 
 export const fonts = {

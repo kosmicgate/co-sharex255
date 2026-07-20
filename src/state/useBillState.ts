@@ -1,6 +1,7 @@
 import { useCallback, useMemo, useState } from 'react';
 import type { Assignment, Item, Person, SplitMode } from './types';
 import { computeTotals } from './computeTotals';
+import { getInvalidManualItemIds } from './validation';
 
 const DEFAULT_TAX_PCT = 8.5;
 const DEFAULT_TIP_PCT = 18;
@@ -141,6 +142,11 @@ export function useBillState() {
     [people, items, assignments, taxPct, tipPct, discountAmt],
   );
 
+  const invalidItemIds = useMemo(
+    () => getInvalidManualItemIds(items, assignments),
+    [items, assignments],
+  );
+
   const reset = useCallback(() => {
     setStep(0);
     setPeople(defaultPeople());
@@ -161,7 +167,7 @@ export function useBillState() {
     activeItemId, setActiveItemId,
     assignments, togglePersonForItem, setMode, setPercent,
     taxPct, setTaxPct, tipPct, setTipPct, discountAmt, setDiscountAmt,
-    totals,
+    totals, invalidItemIds,
     reset,
   };
 }

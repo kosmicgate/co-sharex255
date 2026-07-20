@@ -15,7 +15,7 @@ export function AssignDetail({ item, assignment, people, onTogglePerson, onSetMo
   const includedCount = assignment.included.length;
   const equalEach = item && includedCount ? fmt((item.price * item.qty) / includedCount) : fmt(0);
   const sumPercent = assignment.included.reduce((sum, pid) => sum + (assignment.percents[pid] || 0), 0);
-  const sumColor = sumPercent === 100 ? colors.teal : colors.orange;
+  const sumColor = sumPercent === 100 ? colors.teal : colors.red;
 
   const modeBtnStyle = (active: boolean): React.CSSProperties => ({
     cursor: 'pointer', border: `1.5px solid ${colors.ink}`, borderRadius: 6, padding: '8px 14px',
@@ -72,7 +72,10 @@ export function AssignDetail({ item, assignment, people, onTogglePerson, onSetMo
               </div>
             );
           })}
-          <div style={{ fontFamily: fonts.mono, fontSize: 12, color: sumColor }}>Total assigned: {sumPercent}%</div>
+          <div style={{ fontFamily: fonts.mono, fontSize: 12, color: sumColor }}>
+            Total assigned: {sumPercent}%
+            {sumPercent !== 100 && ' — must equal 100% to continue'}
+          </div>
         </div>
       )}
 
