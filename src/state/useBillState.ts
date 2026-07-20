@@ -8,8 +8,8 @@ const DEFAULT_TIP_PCT = 18;
 
 function defaultPeople(): Person[] {
   return [
-    { id: 'p1', name: 'Alex' },
-    { id: 'p2', name: 'Sam' },
+    { id: 'p1', name: 'Boat' },
+    { id: 'p2', name: 'Oil' },
   ];
 }
 
