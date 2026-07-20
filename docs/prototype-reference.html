@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Archivo+Black&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#efece0}
+*{box-sizing:border-box}
+input[type=range]{accent-color:#dd8a3a}
+::selection{background:#f3dcae}
+a{color:#2f7d6e}
+a:hover{color:#dd8a3a}
+</style>
+</helmet>
+
+<div style="min-height:100vh;background:#efece0;font-family:'Archivo',sans-serif;color:#1c1c1a;padding:36px 6vw 80px;display:flex;flex-direction:column;gap:0">
+
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:34px">
+<div style="display:flex;align-items:center;gap:10px">
+<div style="width:30px;height:30px;border:2px solid #1c1c1a;border-radius:7px;position:relative;background:#dd8a3a"><div style="position:absolute;inset:0;border-left:2px dashed #1c1c1a;left:50%"></div></div>
+<div style="font-family:'Archivo Black',sans-serif;font-size:16px;letter-spacing:0.01em">Co-shareX255</div>
+</div>
+<div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8b8370;letter-spacing:0.06em">STEP {{ stepNum }} OF 4</div>
+</div>
+
+<div style="text-align:center;margin-bottom:26px">
+<h1 style="font-family:'Archivo Black',sans-serif;font-size:clamp(32px,5vw,56px);margin:0;letter-spacing:-0.01em">SPLIT THE BILL</h1>
+<p style="margin:10px 0 0;color:#5c5647;font-size:16px">{{ subtitle }}</p>
+</div>
+
+<div style="display:flex;justify-content:center;margin-bottom:28px">
+<div style="display:inline-flex;align-items:center;gap:10px;border:1.5px solid #1c1c1a;border-radius:22px;padding:8px 18px;background:#e7e2cd;font-family:'IBM Plex Mono',monospace;font-size:12px">
+<span style="width:7px;height:7px;border-radius:50%;background:#2f7d6e;display:inline-block"></span>
+<span>{{ peopleCountLabel }}</span><span style="color:#c8bfa0">|</span>
+<span>{{ itemsCountLabel }}</span><span style="color:#c8bfa0">|</span>
+<span>SUBTOTAL {{ subtotalFmt }}</span>
+</div>
+</div>
+
+<div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:32px">
+<sc-for list="{{ tabs }}" as="tab" hint-placeholder-count="4">
+<div onClick="{{ tab.onClick }}" style="{{ tab.style }}">
+<div style="font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:13px;letter-spacing:0.04em">{{ tab.num }} {{ tab.title }}</div>
+<div style="font-size:11px;color:#8b8370;margin-top:2px">{{ tab.sub }}</div>
+</div>
+</sc-for>
+</div>
+
+<div style="max-width:1080px;margin:0 auto;width:100%">
+
+<sc-if value="{{ isStep0 }}" hint-placeholder-val="{{ true }}">
+<div style="display:flex;gap:24px;flex-wrap:wrap;align-items:stretch">
+
+<div style="width:280px;flex:none;background:#e7e2cd;border:1.5px solid #1c1c1a;border-top:4px solid #dd8a3a;border-radius:8px;padding:20px;display:flex;flex-direction:column;gap:12px">
+<div style="font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:0.08em;color:#8b8370">PEOPLE</div>
+<div style="font-size:13px;color:#5c5647;margin-top:-6px">Who's splitting this bill?</div>
+<div style="display:flex;flex-wrap:wrap;gap:6px">
+<sc-for list="{{ people }}" as="person" hint-placeholder-count="2">
+<div style="display:inline-flex;align-items:center;gap:6px;border:1.5px solid #1c1c1a;border-radius:18px;padding:4px 6px 4px 12px;background:#fff;font-size:13px">
+<span>{{ person.name }}</span>
+<span onClick="{{ person.onRemove }}" style="cursor:pointer;width:16px;height:16px;border-radius:50%;background:#1c1c1a;color:#efece0;font-size:10px;display:flex;align-items:center;justify-content:center">✕</span>
+</div>
+</sc-for>
+</div>
+<div style="display:flex;gap:6px;margin-top:4px">
+<input value="{{ newPersonName }}" onChange="{{ onNewPersonChange }}" onKeyDown="{{ onNewPersonKeyDown }}" placeholder="Add a name" style="flex:1;border:1.5px solid #1c1c1a;border-radius:6px;padding:8px 10px;font-family:'Archivo',sans-serif;font-size:13px;background:#fff" />
+<div onClick="{{ onAddPerson }}" style="cursor:pointer;border:1.5px solid #1c1c1a;border-radius:6px;width:36px;display:flex;align-items:center;justify-content:center;background:#1c1c1a;color:#efece0;font-size:16px">+</div>
+</div>
+</div>
+
+<div style="flex:1;min-width:280px;display:flex;flex-direction:column;gap:10px">
+<input type="file" accept="image/*" ref="{{ fileInputRef }}" onChange="{{ onFileChange }}" style="display:none" />
+<div style="{{ photoPreviewWrapStyle }}">
+<img src="{{ photoUrl }}" style="width:100%;height:300px;object-fit:cover;display:block" />
+</div>
+<div onClick="{{ onDropzoneClick }}" style="{{ dropzoneStyle }}">
+<div style="font-size:15px;color:#5c5647">{{ dropzoneLabel }}</div>
+<div style="font-size:12px;color:#8b8370;margin-top:4px">JPG or PNG · we'll pull out the line items</div>
+</div>
+</div>
+
+</div>
+</sc-if>
+
+<sc-if value="{{ isStep1 }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;gap:24px;flex-wrap:wrap;align-items:flex-start">
+
+<div style="width:280px;flex:none;background:#e7e2cd;border:1.5px solid #1c1c1a;border-top:4px solid #2f7d6e;border-radius:8px;padding:20px;display:flex;flex-direction:column;gap:14px">
+<div style="font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:0.08em;color:#8b8370">BILL TOTALS</div>
+<div>
+<div style="font-size:12px;color:#5c5647;margin-bottom:4px">Tax %</div>
+<input value="{{ taxPct }}" onChange="{{ onTaxChange }}" type="number" style="width:100%;border:1.5px solid #1c1c1a;border-radius:6px;padding:8px 10px;font-family:'IBM Plex Mono',monospace;font-size:13px;background:#fff" />
+</div>
+<div>
+<div style="font-size:12px;color:#5c5647;margin-bottom:4px">Tip %</div>
+<input value="{{ tipPct }}" onChange="{{ onTipChange }}" type="number" style="width:100%;border:1.5px solid #1c1c1a;border-radius:6px;padding:8px 10px;font-family:'IBM Plex Mono',monospace;font-size:13px;background:#fff" />
+</div>
+<div>
+<div style="font-size:12px;color:#5c5647;margin-bottom:4px">Discount ({{ currencySymbol }})</div>
+<input value="{{ discountAmt }}" onChange="{{ onDiscountChange }}" type="number" style="width:100%;border:1.5px solid #1c1c1a;border-radius:6px;padding:8px 10px;font-family:'IBM Plex Mono',monospace;font-size:13px;background:#fff" />
+</div>
+</div>
+
+<div style="flex:1;min-width:300px;background:#fff;border:1.5px solid #1c1c1a;border-radius:8px;overflow:hidden">
+<div style="display:grid;grid-template-columns:1fr 90px 60px 90px 32px;gap:8px;padding:12px 16px;background:#e7e2cd;border-bottom:1.5px solid #1c1c1a;font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:0.05em;color:#8b8370">
+<div>ITEM</div><div>PRICE</div><div>QTY</div><div>TOTAL</div><div></div>
+</div>
+<sc-for list="{{ itemRows }}" as="item" hint-placeholder-count="3">
+<div style="display:grid;grid-template-columns:1fr 90px 60px 90px 32px;gap:8px;padding:10px 16px;border-bottom:1px dashed #d3cbae;align-items:center">
+<input value="{{ item.name }}" onChange="{{ item.onName }}" style="border:none;background:transparent;font-size:14px;font-family:'Archivo',sans-serif;padding:4px" />
+<input value="{{ item.price }}" onChange="{{ item.onPrice }}" type="number" style="border:1px solid #d3cbae;border-radius:5px;padding:4px 6px;font-family:'IBM Plex Mono',monospace;font-size:13px" />
+<input value="{{ item.qty }}" onChange="{{ item.onQty }}" type="number" min="1" style="border:1px solid #d3cbae;border-radius:5px;padding:4px 6px;font-family:'IBM Plex Mono',monospace;font-size:13px" />
+<div style="font-family:'IBM Plex Mono',monospace;font-size:13px">{{ item.totalFmt }}</div>
+<div onClick="{{ item.onRemove }}" style="cursor:pointer;color:#8b8370;text-align:center">✕</div>
+</div>
+</sc-for>
+<div onClick="{{ onAddItem }}" style="cursor:pointer;padding:12px 16px;font-size:13px;color:#5c5647;text-align:center;border-bottom:1.5px solid #1c1c1a">+ Add item manually</div>
+<div style="padding:14px 16px;display:flex;flex-direction:column;gap:4px;font-family:'IBM Plex Mono',monospace;font-size:13px">
+<div style="display:flex;justify-content:space-between;color:#5c5647"><span>Subtotal</span><span>{{ subtotalFmt }}</span></div>
+<div style="display:flex;justify-content:space-between;color:#5c5647"><span>Tax + Tip</span><span>{{ taxTipFmt }}</span></div>
+<div style="display:flex;justify-content:space-between;color:#5c5647"><span>Discount</span><span>-{{ discountFmt }}</span></div>
+<div style="display:flex;justify-content:space-between;font-size:16px;font-weight:700;color:#2f7d6e;margin-top:4px"><span>Total</span><span>{{ grandTotalFmt }}</span></div>
+</div>
+</div>
+
+</div>
+</sc-if>
+
+<sc-if value="{{ isStep2 }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;gap:24px;flex-wrap:wrap;align-items:flex-start">
+
+<div style="width:280px;flex:none;background:#e7e2cd;border:1.5px solid #1c1c1a;border-top:4px solid #dd8a3a;border-radius:8px;padding:12px;display:flex;flex-direction:column;gap:6px">
+<div style="font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:0.08em;color:#8b8370;padding:0 8px">ITEMS</div>
+<sc-for list="{{ selectorItems }}" as="item" hint-placeholder-count="3">
+<div onClick="{{ item.onClick }}" style="{{ item.style }}">
+<span>{{ item.name }}</span><span style="font-family:'IBM Plex Mono',monospace">{{ item.priceFmt }}</span>
+</div>
+</sc-for>
+</div>
+
+<div style="flex:1;min-width:300px;background:#fff;border:1.5px solid #1c1c1a;border-radius:8px;padding:22px;display:flex;flex-direction:column;gap:16px">
+<div style="display:flex;justify-content:space-between;align-items:baseline">
+<div style="font-size:18px;font-weight:700">{{ activeItemName }}</div>
+<div style="font-family:'IBM Plex Mono',monospace;color:#5c5647">{{ activeItemPriceFmt }}</div>
+</div>
+
+<div style="display:flex;flex-wrap:wrap;gap:8px">
+<sc-for list="{{ activeAssignPeople }}" as="p" hint-placeholder-count="2">
+<div onClick="{{ p.onToggle }}" style="{{ p.style }}">{{ p.name }}</div>
+</sc-for>
+</div>
+
+<div style="display:flex;gap:8px">
+<div onClick="{{ onSetEqual }}" style="{{ equalBtnStyle }}">Split equally</div>
+<div onClick="{{ onSetManual }}" style="{{ manualBtnStyle }}">Manual %</div>
+</div>
+
+<sc-if value="{{ isManualMode }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;flex-direction:column;gap:10px">
+<sc-for list="{{ manualRows }}" as="row" hint-placeholder-count="2">
+<div style="display:flex;align-items:center;gap:10px">
+<div style="width:60px;font-size:13px">{{ row.name }}</div>
+<input type="range" min="0" max="100" value="{{ row.percent }}" onChange="{{ row.onChange }}" style="flex:1" />
+<div style="width:44px;font-family:'IBM Plex Mono',monospace;font-size:13px;text-align:right">{{ row.percentFmt }}</div>
+</div>
+</sc-for>
+<div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:{{ sumColor }}">Total assigned: {{ sumPercentFmt }}</div>
+</div>
+</sc-if>
+<sc-if value="{{ isManualMode }}" hint-placeholder-val="{{ false }}">
+</sc-if>
+
+<sc-if value="{{ isEqualMode }}" hint-placeholder-val="{{ true }}">
+<div style="font-size:13px;color:#5c5647">Split evenly across {{ includedCount }} people — {{ equalEachFmt }} each.</div>
+</sc-if>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ isStep3 }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;flex-direction:column;gap:24px">
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px">
+<sc-for list="{{ personCards }}" as="pc" hint-placeholder-count="2">
+<div style="background:#e7e2cd;border:1.5px solid #1c1c1a;border-top:4px solid {{ pc.accent }};border-radius:8px;padding:18px">
+<div style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:0.06em;color:#8b8370">{{ pc.name }}</div>
+<div style="font-family:'Archivo Black',sans-serif;font-size:30px;margin-top:8px;color:{{ pc.accent }}">{{ pc.totalFmt }}</div>
+</div>
+</sc-for>
+</div>
+
+<div style="background:#fff;border:1.5px solid #1c1c1a;border-radius:8px;padding:22px;display:flex;flex-direction:column;gap:14px">
+<div style="font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:0.08em;color:#8b8370">SHARE THIS BILL</div>
+<div style="display:flex;gap:10px;flex-wrap:wrap">
+<input value="{{ shareLink }}" readOnly="{{ true }}" style="flex:1;min-width:220px;border:1.5px solid #1c1c1a;border-radius:6px;padding:10px 12px;font-family:'IBM Plex Mono',monospace;font-size:13px;background:#efece0" />
+<div onClick="{{ onCopyLink }}" style="cursor:pointer;border:1.5px solid #1c1c1a;border-radius:6px;padding:10px 18px;background:#1c1c1a;color:#efece0;font-size:13px;font-weight:600">{{ copyLabel }}</div>
+</div>
+</div>
+</div>
+</sc-if>
+
+<div style="display:flex;justify-content:space-between;margin-top:36px">
+<div onClick="{{ onPrev }}" style="{{ prevStyle }}">← Back</div>
+<div onClick="{{ onNext }}" style="{{ nextStyle }}">{{ nextLabel }}</div>
+</div>
+
+</div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;: {&quot;width&quot;: 1200, &quot;height&quot;: 900}, &quot;currencySymbol&quot;: {&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;$&quot;,&quot;tsType&quot;:&quot;string&quot;}, &quot;defaultTaxPercent&quot;: {&quot;editor&quot;:&quot;float&quot;,&quot;default&quot;:8.5,&quot;tsType&quot;:&quot;number&quot;,&quot;min&quot;:0,&quot;max&quot;:30,&quot;step&quot;:0.5,&quot;section&quot;:&quot;Bill defaults&quot;}, &quot;defaultTipPercent&quot;: {&quot;editor&quot;:&quot;float&quot;,&quot;default&quot;:18,&quot;tsType&quot;:&quot;number&quot;,&quot;min&quot;:0,&quot;max&quot;:30,&quot;step&quot;:1,&quot;section&quot;:&quot;Bill defaults&quot;}}">
+class Component extends DCLogic {
+  state = {
+    step: 0,
+    people: [{id:'p1',name:'Alex'},{id:'p2',name:'Sam'}],
+    photoUrl: null,
+    items: [],
+    activeItemId: null,
+    assignments: {},
+    newPersonName: '',
+    taxPct: null,
+    tipPct: null,
+    discountAmt: 0,
+    nextId: 1,
+    copied: false
+  };
+
+  fileInputRef = React.createRef();
+
+  fmt(n) {
+    const sym = this.props.currencySymbol ?? '$';
+    return sym + (Math.round((n + Number.EPSILON) * 100) / 100).toFixed(2);
+  }
+
+  genId(prefix) { const id = prefix + this.state.nextId; this.setState(s => ({nextId: s.nextId + 1})); return id; }
+
+  addPerson = (name) => {
+    if (!name || !name.trim()) return;
+    const id = 'p' + Date.now() + Math.floor(Math.random()*1000);
+    this.setState(s => {
+      const people = [...s.people, {id, name: name.trim()}];
+      const assignments = {...s.assignments};
+      Object.keys(assignments).forEach(itemId => {
+        const a = assignments[itemId];
+        if (a.mode === 'equal') {
+          const included = [...a.included, id];
+          assignments[itemId] = {...a, included};
+        }
+      });
+      return {people, assignments, newPersonName: ''};
+    });
+  };
+
+  removePerson = (id) => {
+    this.setState(s => {
+      const people = s.people.filter(p => p.id !== id);
+      const assignments = {...s.assignments};
+      Object.keys(assignments).forEach(itemId => {
+        const a = assignments[itemId];
+        const included = a.included.filter(pid => pid !== id);
+        const percents = {...a.percents}; delete percents[id];
+        assignments[itemId] = {...a, included, percents};
+      });
+      return {people, assignments};
+    });
+  };
+
+  onFileChange = (e) => {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+    const url = URL.createObjectURL(file);
+    this.setState({photoUrl: url});
+    if (this.state.items.length === 0) this.seedItemsFromPhoto();
+  };
+
+  seedItemsFromPhoto = () => {
+    const seed = [
+      {name:'Pad Thai', price:12, qty:1},
+      {name:'Green Curry', price:14, qty:1},
+      {name:'Iced Tea', price:3, qty:2}
+    ];
+    this.setState(s => {
+      let nid = s.nextId;
+      const items = seed.map(it => ({id:'i'+(nid++), ...it}));
+      const assignments = {...s.assignments};
+      items.forEach(it => { assignments[it.id] = {mode:'equal', included: s.people.map(p=>p.id), percents:{}}; });
+      return {items, assignments, nextId: nid, activeItemId: items[0] ? items[0].id : s.activeItemId};
+    });
+  };
+
+  addItem = () => {
+    this.setState(s => {
+      const id = 'i' + s.nextId;
+      const item = {id, name:'New item', price:0, qty:1};
+      const assignments = {...s.assignments, [id]: {mode:'equal', included: s.people.map(p=>p.id), percents:{}}};
+      return {items:[...s.items, item], assignments, nextId: s.nextId+1, activeItemId: s.activeItemId || id};
+    });
+  };
+
+  updateItem = (id, field, value) => {
+    this.setState(s => ({items: s.items.map(it => it.id===id ? {...it, [field]: (field==='price'||field==='qty') ? Number(value)||0 : value} : it)}));
+  };
+
+  removeItem = (id) => {
+    this.setState(s => {
+      const items = s.items.filter(it => it.id !== id);
+      const assignments = {...s.assignments}; delete assignments[id];
+      let activeItemId = s.activeItemId;
+      if (activeItemId === id) activeItemId = items[0] ? items[0].id : null;
+      return {items, assignments, activeItemId};
+    });
+  };
+
+  togglePersonForItem = (itemId, personId) => {
+    this.setState(s => {
+      const a = s.assignments[itemId] || {mode:'equal', included:[], percents:{}};
+      const included = a.included.includes(personId) ? a.included.filter(id=>id!==personId) : [...a.included, personId];
+      return {assignments: {...s.assignments, [itemId]: {...a, included}}};
+    });
+  };
+
+  setMode = (itemId, mode) => {
+    this.setState(s => {
+      const a = s.assignments[itemId];
+      if (!a) return null;
+      let percents = {...a.percents};
+      if (mode === 'manual' && a.included.length) {
+        const even = 100 / a.included.length;
+        a.included.forEach(id => { if (percents[id] == null) percents[id] = Math.round(even); });
+      }
+      return {assignments: {...s.assignments, [itemId]: {...a, mode, percents}}};
+    });
+  };
+
+  setPercent = (itemId, personId, value) => {
+    this.setState(s => {
+      const a = s.assignments[itemId];
+      return {assignments: {...s.assignments, [itemId]: {...a, percents: {...a.percents, [personId]: Number(value)}}}};
+    });
+  };
+
+  personShare(item, personId) {
+    const a = this.state.assignments[item.id];
+    if (!a || !a.included.includes(personId)) return 0;
+    if (a.mode === 'equal') return 1 / a.included.length;
+    return (a.percents[personId] || 0) / 100;
+  }
+
+  computeTotals() {
+    const items = this.state.items;
+    const subtotal = items.reduce((sum,it) => sum + it.price*it.qty, 0);
+    const taxPct = this.state.taxPct ?? (this.props.defaultTaxPercent ?? 8.5);
+    const tipPct = this.state.tipPct ?? (this.props.defaultTipPercent ?? 18);
+    const discountAmt = this.state.discountAmt || 0;
+    const taxAmt = subtotal * taxPct/100;
+    const tipAmt = subtotal * tipPct/100;
+    const grandTotal = subtotal + taxAmt + tipAmt - discountAmt;
+    const perPersonSubtotal = {};
+    this.state.people.forEach(p => perPersonSubtotal[p.id] = 0);
+    items.forEach(it => {
+      const itemTotal = it.price*it.qty;
+      this.state.people.forEach(p => { perPersonSubtotal[p.id] += itemTotal * this.personShare(it, p.id); });
+    });
+    const extra = taxAmt + tipAmt - discountAmt;
+    const perPersonTotal = {};
+    this.state.people.forEach(p => {
+      const share = subtotal > 0 ? perPersonSubtotal[p.id]/subtotal : 0;
+      perPersonTotal[p.id] = perPersonSubtotal[p.id] + share*extra;
+    });
+    return {subtotal, taxPct, tipPct, discountAmt, taxAmt, tipAmt, grandTotal, perPersonTotal};
+  }
+
+  renderVals() {
+    const s = this.state;
+    const totals = this.computeTotals();
+    const step = s.step;
+    const stepMeta = [
+      {num:'1', title:'UPLOAD', sub:'photo + people'},
+      {num:'2', title:'ITEMS', sub:'edit line items'},
+      {num:'3', title:'ASSIGN', sub:'split each item'},
+      {num:'4', title:'SUMMARY', sub:'send + share'}
+    ];
+    const tabs = stepMeta.map((t,i) => ({
+      num:t.num, title:t.title, sub:t.sub,
+      onClick: () => this.setState({step:i}),
+      style: `cursor:pointer;border:1.5px solid #1c1c1a;border-radius:7px;padding:10px 16px;text-align:center;min-width:120px;background:${i===step?'#f3dcae':'#efece0'};border-color:${i===step?'#dd8a3a':'#1c1c1a'}`
+    }));
+
+    const subtitles = [
+      'Snap the receipt and say who\u2019s in.',
+      'Check the line items pulled from your photo.',
+      'Tap who had what, then split it.',
+      'Here\u2019s what everyone owes.'
+    ];
+
+    const activeItem = s.items.find(it => it.id === s.activeItemId) || s.items[0];
+    const activeAssign = activeItem ? (s.assignments[activeItem.id] || {mode:'equal',included:[],percents:{}}) : {mode:'equal',included:[],percents:{}};
+
+    return {
+      stepNum: step+1,
+      subtitle: subtitles[step],
+      peopleCountLabel: s.people.length + (s.people.length===1?' PERSON':' PEOPLE'),
+      itemsCountLabel: s.items.length + (s.items.length===1?' ITEM':' ITEMS'),
+      subtotalFmt: this.fmt(totals.subtotal),
+      tabs,
+      isStep0: step===0, isStep1: step===1, isStep2: step===2, isStep3: step===3,
+
+      people: s.people.map(p => ({id:p.id, name:p.name, onRemove: () => this.removePerson(p.id)})),
+      newPersonName: s.newPersonName,
+      onNewPersonChange: (e) => this.setState({newPersonName: e.target.value}),
+      onNewPersonKeyDown: (e) => { if (e.key==='Enter') this.addPerson(s.newPersonName); },
+      onAddPerson: () => this.addPerson(s.newPersonName),
+
+      fileInputRef: this.fileInputRef,
+      onFileChange: this.onFileChange,
+      onDropzoneClick: () => this.fileInputRef.current && this.fileInputRef.current.click(),
+      hasPhoto: !!s.photoUrl,
+      photoUrl: s.photoUrl || 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ycQAJPfMkgi4b58EA==',
+      photoPreviewWrapStyle: `border:1.5px solid #1c1c1a;border-radius:8px;background:#fff;overflow:hidden;display:${s.photoUrl?'block':'none'}`,
+      dropzoneLabel: s.photoUrl ? 'Retake photo' : 'Tap to upload a photo of the bill',
+      dropzoneStyle: `cursor:pointer;border:2px dashed #1c1c1a;border-radius:8px;padding:${s.photoUrl?'16px':'56px 20px'};text-align:center;background:#e7e2cd`,
+
+      itemRows: s.items.map(it => ({
+        name: it.name, price: it.price, qty: it.qty,
+        totalFmt: this.fmt(it.price*it.qty),
+        onName: (e) => this.updateItem(it.id,'name',e.target.value),
+        onPrice: (e) => this.updateItem(it.id,'price',e.target.value),
+        onQty: (e) => this.updateItem(it.id,'qty',e.target.value),
+        onRemove: () => this.removeItem(it.id)
+      })),
+      onAddItem: this.addItem,
+      taxPct: s.taxPct ?? totals.taxPct,
+      tipPct: s.tipPct ?? totals.tipPct,
+      discountAmt: s.discountAmt,
+      currencySymbol: this.props.currencySymbol ?? '$',
+      onTaxChange: (e) => this.setState({taxPct: Number(e.target.value)||0}),
+      onTipChange: (e) => this.setState({tipPct: Number(e.target.value)||0}),
+      onDiscountChange: (e) => this.setState({discountAmt: Number(e.target.value)||0}),
+      taxTipFmt: this.fmt(totals.taxAmt+totals.tipAmt),
+      discountFmt: this.fmt(totals.discountAmt),
+      grandTotalFmt: this.fmt(totals.grandTotal),
+
+      selectorItems: s.items.map(it => ({
+        name: it.name, priceFmt: this.fmt(it.price*it.qty),
+        onClick: () => this.setState({activeItemId: it.id}),
+        style: `cursor:pointer;display:flex;justify-content:space-between;padding:10px 8px;border-radius:6px;font-size:13px;background:${activeItem && it.id===activeItem.id ? '#f3dcae':'transparent'}`
+      })),
+      activeItemName: activeItem ? activeItem.name : 'No items yet',
+      activeItemPriceFmt: activeItem ? this.fmt(activeItem.price*activeItem.qty) : '',
+      activeAssignPeople: s.people.map(p => {
+        const included = activeAssign.included.includes(p.id);
+        return {
+          name: p.name,
+          onToggle: () => activeItem && this.togglePersonForItem(activeItem.id, p.id),
+          style: `cursor:pointer;border:1.5px solid #1c1c1a;border-radius:18px;padding:6px 14px;font-size:13px;background:${included?'#f3dcae':'#fff'}`
+        };
+      }),
+      onSetEqual: () => activeItem && this.setMode(activeItem.id,'equal'),
+      onSetManual: () => activeItem && this.setMode(activeItem.id,'manual'),
+      equalBtnStyle: `cursor:pointer;border:1.5px solid #1c1c1a;border-radius:6px;padding:8px 14px;font-size:13px;background:${activeAssign.mode==='equal'?'#1c1c1a':'#fff'};color:${activeAssign.mode==='equal'?'#efece0':'#1c1c1a'}`,
+      manualBtnStyle: `cursor:pointer;border:1.5px solid #1c1c1a;border-radius:6px;padding:8px 14px;font-size:13px;background:${activeAssign.mode==='manual'?'#1c1c1a':'#fff'};color:${activeAssign.mode==='manual'?'#efece0':'#1c1c1a'}`,
+      isManualMode: activeAssign.mode==='manual',
+      isEqualMode: activeAssign.mode==='equal',
+      includedCount: activeAssign.included.length,
+      equalEachFmt: activeItem && activeAssign.included.length ? this.fmt((activeItem.price*activeItem.qty)/activeAssign.included.length) : this.fmt(0),
+      manualRows: activeAssign.included.map(pid => {
+        const p = s.people.find(pp=>pp.id===pid);
+        const percent = activeAssign.percents[pid] ?? 0;
+        return {
+          name: p ? p.name : '', percent,
+          percentFmt: percent+'%',
+          onChange: (e) => activeItem && this.setPercent(activeItem.id, pid, e.target.value)
+        };
+      }),
+      sumPercentFmt: activeAssign.included.reduce((sum,pid)=> sum + (activeAssign.percents[pid]||0), 0) + '%',
+      sumColor: (() => { const sum = activeAssign.included.reduce((t,pid)=>t+(activeAssign.percents[pid]||0),0); return sum===100 ? '#2f7d6e' : '#dd8a3a'; })(),
+
+      personCards: s.people.map((p,i) => ({
+        name: p.name.toUpperCase(),
+        totalFmt: this.fmt(totals.perPersonTotal[p.id] || 0),
+        accent: i%2===0 ? '#dd8a3a' : '#2f7d6e'
+      })),
+      shareLink: 'https://splitr.app/s/' + (s.people.length ? s.people.map(p=>p.name.slice(0,1)).join('').toLowerCase() : 'xxxx') + Math.abs(s.nextId*7).toString(36),
+      onCopyLink: () => { this.setState({copied:true}); setTimeout(()=>this.setState({copied:false}), 1500); },
+      copyLabel: s.copied ? 'Copied!' : 'Copy link',
+
+      prevStyle: `cursor:${step===0?'default':'pointer'};opacity:${step===0?0.3:1};border:1.5px solid #1c1c1a;border-radius:6px;padding:12px 22px;font-size:14px;font-weight:600;background:#fff`,
+      onPrev: () => { if (step>0) this.setState({step: step-1}); },
+      nextLabel: step===3 ? 'Start over' : (step===0 ? 'Continue' : (step===1 ? 'Assign people' : 'Review summary')),
+      nextStyle: `cursor:pointer;border:1.5px solid #1c1c1a;border-radius:6px;padding:12px 26px;font-size:14px;font-weight:600;background:#1c1c1a;color:#efece0`,
+      onNext: () => {
+        if (step===3) {
+          this.setState({step:0, people:[{id:'p1',name:'Alex'},{id:'p2',name:'Sam'}], photoUrl:null, items:[], activeItemId:null, assignments:{}, taxPct:null, tipPct:null, discountAmt:0, copied:false});
+        } else {
+          this.setState({step: step+1});
+        }
+      }
+    };
+  }
+}
+</script>
+</body>
+</html>

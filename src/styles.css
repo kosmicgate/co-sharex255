@@ -1,0 +1,24 @@
+body {
+  margin: 0;
+  background: #efece0;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+input[type='range'] {
+  accent-color: #dd8a3a;
+}
+
+::selection {
+  background: #f3dcae;
+}
+
+a {
+  color: #2f7d6e;
+}
+
+a:hover {
+  color: #dd8a3a;
+}
