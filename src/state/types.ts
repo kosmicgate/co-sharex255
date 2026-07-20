@@ -27,6 +27,12 @@ export interface BillData {
   discountAmt: number;
 }
 
+export interface PersonItemShare {
+  itemId: string;
+  name: string;
+  amount: number;
+}
+
 export interface Totals {
   subtotal: number;
   taxPct: number;
@@ -36,4 +42,6 @@ export interface Totals {
   tipAmt: number;
   grandTotal: number;
   perPersonTotal: Record<string, number>;
+  perPersonItems: Record<string, PersonItemShare[]>;
+  perPersonExtra: Record<string, number>;
 }

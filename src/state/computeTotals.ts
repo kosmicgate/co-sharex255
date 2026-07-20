@@ -1,4 +1,4 @@
-import type { Assignment, BillData, Item, Totals } from './types';
+import type { Assignment, BillData, Item, PersonItemShare, Totals } from './types';
 
 function personShare(assignment: Assignment | undefined, personId: string): number {
   if (!assignment || !assignment.included.includes(personId)) return 0;
@@ -14,20 +14,30 @@ export function computeTotals(bill: Pick<BillData, 'people' | 'items' | 'assignm
   const grandTotal = subtotal + taxAmt + tipAmt - discountAmt;
 
   const perPersonSubtotal: Record<string, number> = {};
-  people.forEach((p) => { perPersonSubtotal[p.id] = 0; });
+  const perPersonItems: Record<string, PersonItemShare[]> = {};
+  people.forEach((p) => { perPersonSubtotal[p.id] = 0; perPersonItems[p.id] = []; });
   items.forEach((it) => {
     const itemTotal = it.price * it.qty;
     people.forEach((p) => {
-      perPersonSubtotal[p.id] += itemTotal * personShare(assignments[it.id], p.id);
+      const share = personShare(assignments[it.id], p.id);
+      if (share <= 0) return;
+      const amount = itemTotal * share;
+      perPersonSubtotal[p.id] += amount;
+      perPersonItems[p.id].push({ itemId: it.id, name: it.name, amount });
     });
   });
 
   const extra = taxAmt + tipAmt - discountAmt;
   const perPersonTotal: Record<string, number> = {};
+  const perPersonExtra: Record<string, number> = {};
   people.forEach((p) => {
     const share = subtotal > 0 ? perPersonSubtotal[p.id] / subtotal : 0;
-    perPersonTotal[p.id] = perPersonSubtotal[p.id] + share * extra;
+    perPersonExtra[p.id] = share * extra;
+    perPersonTotal[p.id] = perPersonSubtotal[p.id] + perPersonExtra[p.id];
   });
 
-  return { subtotal, taxPct, tipPct, discountAmt, taxAmt, tipAmt, grandTotal, perPersonTotal };
+  return {
+    subtotal, taxPct, tipPct, discountAmt, taxAmt, tipAmt, grandTotal,
+    perPersonTotal, perPersonItems, perPersonExtra,
+  };
 }

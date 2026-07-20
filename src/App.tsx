@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react';
 import { colors, fonts } from './theme';
 import { Header } from './components/Header';
 import { Hero } from './components/Hero';
@@ -9,32 +8,11 @@ import { Step1Upload } from './steps/Step1Upload';
 import { Step2Items } from './steps/Step2Items';
 import { Step3Assign } from './steps/Step3Assign';
 import { Step4Summary } from './steps/Step4Summary';
-import { SharedBillView } from './steps/SharedBillView';
 import { useBillState } from './state/useBillState';
 import { fmt } from './lib/currency';
 
-function useSharedBillId(): string | null {
-  const [id, setId] = useState<string | null>(() => parseHash());
-  useEffect(() => {
-    const onHashChange = () => setId(parseHash());
-    window.addEventListener('hashchange', onHashChange);
-    return () => window.removeEventListener('hashchange', onHashChange);
-  }, []);
-  return id;
-}
-
-function parseHash(): string | null {
-  const match = window.location.hash.match(/^#\/s\/(.+)$/);
-  return match ? match[1] : null;
-}
-
 export default function App() {
-  const sharedId = useSharedBillId();
   const bill = useBillState();
-
-  if (sharedId) {
-    return <SharedBillView id={sharedId} />;
-  }
 
   const onNext = () => {
     if (bill.step === 3) {

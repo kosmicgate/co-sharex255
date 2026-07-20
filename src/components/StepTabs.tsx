@@ -4,7 +4,7 @@ const STEP_META = [
   { num: '1', title: 'UPLOAD', sub: 'photo + people' },
   { num: '2', title: 'ITEMS', sub: 'edit line items' },
   { num: '3', title: 'ASSIGN', sub: 'split each item' },
-  { num: '4', title: 'SUMMARY', sub: 'send + share' },
+  { num: '4', title: 'SUMMARY', sub: 'who owes what' },
 ];
 
 export function StepTabs({ step, onSelect }: { step: number; onSelect: (i: number) => void }) {
