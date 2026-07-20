@@ -11,6 +11,11 @@ const SKIP_KEYWORDS = [
   'subtotal', 'sub total', 'total', 'tax', 'tip', 'gratuity', 'change',
   'cash', 'card', 'visa', 'mastercard', 'amex', 'balance', 'due',
   'discount', 'service charge', 'server', 'table', 'guest', 'thank',
+  // Thai receipts: total/subtotal/grand-total/qty-total lines (all contain รวม),
+  // VAT/tax (ภาษี), discount (ส่วนลด), shipping/service fees, cash/change,
+  // and order-number metadata (สั่งครั้งที่).
+  'รวม', 'ภาษี', 'ส่วนลด', 'หัก', 'ค่าขนส่ง', 'ค่าบริการ',
+  'เงินสด', 'เงินทอน', 'รับเงิน', 'บัตร', 'ครั้งที่',
 ];
 
 // Matches a line ending in a price like "Pad Thai 120.00", "Iced Tea ฿30.00",
@@ -28,22 +33,24 @@ export function parseReceiptText(text: string): OcrLineItem[] {
     const match = line.match(LINE_RE);
     if (!match) continue;
 
-    let name = match[1].trim().replace(/^[-*•\d.\s]+/, '').trim();
     const price = Number(match[2].replace(/,/g, ''));
-    if (!name || !Number.isFinite(price) || price <= 0 || price > 100000) continue;
+    if (!Number.isFinite(price) || price <= 0 || price > 100000) continue;
 
-    // strip a leading qty like "2x Iced Tea" or "2 Iced Tea"
+    // Extract a leading qty like "2x Iced Tea" or "50 เมล็ดกาแฟคั่วเข้ม" BEFORE
+    // stripping leading digits/punctuation, or the qty digits get discarded first.
+    let name = match[1].trim();
     let qty = 1;
     const qtyMatch = name.match(/^(\d+)\s*[xX]?\s+(.+)$/);
     if (qtyMatch) {
       const parsedQty = Number(qtyMatch[1]);
-      if (parsedQty > 0 && parsedQty < 50) {
+      if (parsedQty > 0 && parsedQty <= 999) {
         qty = parsedQty;
         name = qtyMatch[2].trim();
       }
     }
+    name = name.replace(/^[-*•.\s]+/, '').trim();
 
-    if (name.length < 2) continue;
+    if (!name || name.length < 2) continue;
     items.push({ name, price, qty });
   }
 
@@ -52,7 +59,9 @@ export function parseReceiptText(text: string): OcrLineItem[] {
 
 export async function extractReceiptItems(file: File): Promise<OcrLineItem[]> {
   const processed = await preprocessReceiptImage(file);
-  const worker = await createWorker('eng');
+  // Thai receipts mix Thai script item names with Arabic-numeral prices —
+  // 'eng' alone can't recognize Thai characters at all, so load both.
+  const worker = await createWorker(['eng', 'tha']);
   try {
     // Receipts are effectively one column of text — telling Tesseract to
     // treat the page as a single uniform block avoids it trying (and
