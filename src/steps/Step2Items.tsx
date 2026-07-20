@@ -9,7 +9,7 @@ export function Step2Items({ bill }: { bill: BillStateApi }) {
         taxPct={bill.taxPct}
         tipPct={bill.tipPct}
         discountAmt={bill.discountAmt}
-        currencySymbol="$"
+        currencySymbol="฿"
         onTaxChange={bill.setTaxPct}
         onTipChange={bill.setTipPct}
         onDiscountChange={bill.setDiscountAmt}

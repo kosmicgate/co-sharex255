@@ -13,9 +13,9 @@ const SKIP_KEYWORDS = [
   'discount', 'service charge', 'server', 'table', 'guest', 'thank',
 ];
 
-// Matches a line ending in a price like "Pad Thai 12.00", "Iced Tea $3.00",
+// Matches a line ending in a price like "Pad Thai 120.00", "Iced Tea ฿30.00",
 // or "4 Pillars shiraz 1,260.00" (thousands separator).
-const LINE_RE = /^(.+?)\s+\$?(\d{1,3}(?:,\d{3})*(?:\.\d{1,2})?)\s*$/;
+const LINE_RE = /^(.+?)\s+[$฿]?(\d{1,3}(?:,\d{3})*(?:\.\d{1,2})?)\s*$/;
 
 export function parseReceiptText(text: string): OcrLineItem[] {
   const lines = text.split('\n').map((l) => l.trim()).filter(Boolean);
