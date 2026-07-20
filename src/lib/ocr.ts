@@ -22,7 +22,24 @@ const SKIP_KEYWORDS = [
 // or "4 Pillars shiraz 1,260.00" (thousands separator).
 const LINE_RE = /^(.+?)\s+[$฿]?(\d{1,3}(?:,\d{3})*(?:\.\d{1,2})?)\s*$/;
 
-export function parseReceiptText(text: string): OcrLineItem[] {
+// Tesseract's Thai model frequently inserts a stray space between individual
+// glyphs (e.g. "ร ว ม เป ็ นเง ิ น" instead of "รวมเป็นเงิน"). Thai script
+// doesn't use spaces between letters within a word, so collapsing any space
+// sandwiched between two Thai characters is a safe cleanup — it also fixes
+// keyword matching, which otherwise can't find "รวม" inside "ร ว ม".
+const THAI_CHAR_SPACE_RE = /([฀-๿])\s+(?=[฀-๿])/g;
+
+function collapseThaiSpacing(text: string): string {
+  let prev: string;
+  do {
+    prev = text;
+    text = text.replace(THAI_CHAR_SPACE_RE, '$1');
+  } while (text !== prev);
+  return text;
+}
+
+export function parseReceiptText(rawText: string): OcrLineItem[] {
+  const text = collapseThaiSpacing(rawText);
   const lines = text.split('\n').map((l) => l.trim()).filter(Boolean);
   const items: OcrLineItem[] = [];
 
@@ -33,8 +50,11 @@ export function parseReceiptText(text: string): OcrLineItem[] {
     const match = line.match(LINE_RE);
     if (!match) continue;
 
-    const price = Number(match[2].replace(/,/g, ''));
-    if (!Number.isFinite(price) || price <= 0 || price > 100000) continue;
+    // Receipts print the trailing number as the LINE TOTAL for that row
+    // (already qty × unit price), not a per-unit price — e.g. "50  Coffee
+    // Beans  11,875.00" means 50 units for ฿11,875 total, i.e. ฿237.50 each.
+    const lineTotal = Number(match[2].replace(/,/g, ''));
+    if (!Number.isFinite(lineTotal) || lineTotal <= 0 || lineTotal > 1000000) continue;
 
     // Extract a leading qty like "2x Iced Tea" or "50 เมล็ดกาแฟคั่วเข้ม" BEFORE
     // stripping leading digits/punctuation, or the qty digits get discarded first.
@@ -51,6 +71,7 @@ export function parseReceiptText(text: string): OcrLineItem[] {
     name = name.replace(/^[-*•.\s]+/, '').trim();
 
     if (!name || name.length < 2) continue;
+    const price = Math.round((lineTotal / qty) * 100) / 100;
     items.push({ name, price, qty });
   }
 
