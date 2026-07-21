@@ -15,7 +15,7 @@ export function Header({ stepNum }: { stepNum: number }) {
           <line x1="8" y1="17" x2="22" y2="17" stroke={colors.teal} strokeWidth={2} />
           <line x1="8" y1="23" x2="18" y2="23" stroke={colors.ink} strokeWidth={2} />
         </svg>
-        <div style={{ fontFamily: fonts.headline, fontSize: 16, letterSpacing: '0.01em' }}>Co-shareX255</div>
+        <div style={{ fontFamily: fonts.headline, fontSize: 16, letterSpacing: '0.01em' }}>Co-share</div>
       </div>
       <div style={{ fontFamily: fonts.mono, fontSize: 12, color: colors.mutedLight, letterSpacing: '0.06em' }}>
         STEP {stepNum} OF 4
