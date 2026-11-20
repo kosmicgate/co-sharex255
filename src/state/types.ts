@@ -8,6 +8,8 @@ export interface Item {
   name: string;
   price: number;
   qty: number;
+  /** 'ocr' items are replaced when a new receipt photo is read; manual items are kept. */
+  source?: 'ocr' | 'manual';
 }
 
 export type SplitMode = 'equal' | 'manual';
@@ -22,9 +24,6 @@ export interface BillData {
   people: Person[];
   items: Item[];
   assignments: Record<string, Assignment>;
-  taxPct: number;
-  tipPct: number;
-  discountAmt: number;
 }
 
 export interface PersonItemShare {
@@ -35,13 +34,8 @@ export interface PersonItemShare {
 
 export interface Totals {
   subtotal: number;
-  taxPct: number;
-  tipPct: number;
-  discountAmt: number;
-  taxAmt: number;
-  tipAmt: number;
+  discountTotal: number;
   grandTotal: number;
   perPersonTotal: Record<string, number>;
   perPersonItems: Record<string, PersonItemShare[]>;
-  perPersonExtra: Record<string, number>;
 }

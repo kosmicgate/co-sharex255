@@ -1,3 +1,4 @@
 export function fmt(n: number, symbol = '฿'): string {
-  return symbol + (Math.round((n + Number.EPSILON) * 100) / 100).toFixed(2);
+  const rounded = Math.round((Math.abs(n) + Number.EPSILON) * 100) / 100;
+  return (n < 0 && rounded > 0 ? '-' : '') + symbol + rounded.toFixed(2);
 }

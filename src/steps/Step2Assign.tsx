@@ -5,7 +5,7 @@ import type { Assignment } from '../state/types';
 
 const EMPTY_ASSIGNMENT: Assignment = { mode: 'equal', included: [], percents: {} };
 
-export function Step3Assign({ bill }: { bill: BillStateApi }) {
+export function Step2Assign({ bill }: { bill: BillStateApi }) {
   const activeItem = bill.items.find((it) => it.id === bill.activeItemId) || bill.items[0] || null;
   const assignment = activeItem ? (bill.assignments[activeItem.id] || EMPTY_ASSIGNMENT) : EMPTY_ASSIGNMENT;
 
