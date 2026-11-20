@@ -2,7 +2,7 @@ import { colors, fonts } from '../theme';
 
 const STEP_META = [
   { num: '1', title: 'ITEMS', sub: 'items + receipt' },
-  { num: '2', title: 'ASSIGN', sub: 'split each item' },
+  { num: '2', title: 'ASSIGN', sub: 'people + split' },
   { num: '3', title: 'SUMMARY', sub: 'who owes what' },
 ];
 
@@ -40,6 +40,6 @@ export function StepTabs({ step, disabledSteps, onSelect }: {
 
 export const STEP_SUBTITLES = [
   "Add what you ordered, or scan the receipt.",
-  'Tap who had what, then split it.',
+  "Add who's in, then tap who had what.",
   "Here's what everyone owes.",
 ];

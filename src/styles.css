@@ -35,3 +35,10 @@ a:hover {
   .items-grid { grid-template-columns: minmax(0, 1fr) 68px 40px 70px 18px; gap: 6px !important; padding-left: 12px !important; padding-right: 12px !important; font-size: 12px; }
   .people-panel { width: 100% !important; flex: 1 1 100% !important; }
 }
+@media (max-width: 560px) {
+  .assign-side { width: 100% !important; }
+  .assign-side > div { width: 100% !important; }
+}
+@media (max-width: 720px) {
+  .assign-guide { grid-template-columns: 1fr !important; gap: 10px !important; }
+}

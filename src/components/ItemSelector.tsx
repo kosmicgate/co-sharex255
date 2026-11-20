@@ -1,6 +1,7 @@
 import { colors, fonts } from '../theme';
 import { fmt } from '../lib/currency';
 import type { Item } from '../state/types';
+import { StepBadge } from './StepBadge';
 
 export function ItemSelector({ items, activeItemId, invalidItemIds, onSelect }: {
   items: Item[];
@@ -14,7 +15,9 @@ export function ItemSelector({ items, activeItemId, invalidItemIds, onSelect }: 
       borderTop: `4px solid ${colors.orange}`, borderRadius: 8, padding: 12,
       display: 'flex', flexDirection: 'column', gap: 6,
     }}>
-      <div style={{ fontFamily: fonts.mono, fontSize: 12, letterSpacing: '0.08em', color: colors.mutedLight, padding: '0 8px' }}>ITEMS</div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontFamily: fonts.mono, fontSize: 12, letterSpacing: '0.08em', color: colors.mutedLight, padding: '0 8px' }}>
+        <StepBadge n={1} />ITEMS
+      </div>
       {items.map((item) => {
         const isInvalid = invalidItemIds.has(item.id);
         return (

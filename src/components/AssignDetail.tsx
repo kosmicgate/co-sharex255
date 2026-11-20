@@ -1,6 +1,7 @@
 import { colors, fonts } from '../theme';
 import { fmt } from '../lib/currency';
 import type { Assignment, Item, Person } from '../state/types';
+import { SectionLabel } from './StepBadge';
 
 export function AssignDetail({ item, assignment, people, onTogglePerson, onSetMode, onSetPercent }: {
   item: Item | null;
@@ -32,7 +33,8 @@ export function AssignDetail({ item, assignment, people, onTogglePerson, onSetMo
         <div style={{ fontFamily: fonts.mono, color: colors.mutedDark }}>{item ? fmt(item.price * item.qty) : ''}</div>
       </div>
 
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+      <SectionLabel n={2}>WHO PAYS FOR THIS ITEM?</SectionLabel>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: -8 }}>
         {people.map((p) => {
           const included = assignment.included.includes(p.id);
           return (
@@ -50,7 +52,8 @@ export function AssignDetail({ item, assignment, people, onTogglePerson, onSetMo
         })}
       </div>
 
-      <div style={{ display: 'flex', gap: 8 }}>
+      <SectionLabel n={3}>HOW TO SPLIT IT?</SectionLabel>
+      <div style={{ display: 'flex', gap: 8, marginTop: -8 }}>
         <div onClick={() => onSetMode('equal')} style={modeBtnStyle(isEqual)}>Split equally</div>
         <div onClick={() => onSetMode('manual')} style={modeBtnStyle(isManual)}>Manual %</div>
       </div>
