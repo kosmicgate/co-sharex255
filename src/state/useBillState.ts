@@ -3,9 +3,6 @@ import type { Assignment, Item, Person, SplitMode } from './types';
 import { computeTotals } from './computeTotals';
 import { getInvalidManualItemIds } from './validation';
 
-const DEFAULT_TAX_PCT = 8.5;
-const DEFAULT_TIP_PCT = 18;
-
 function defaultPeople(): Person[] {
   return [
     { id: 'p1', name: 'Boat' },
@@ -25,9 +22,6 @@ export function useBillState() {
   const [items, setItems] = useState<Item[]>([]);
   const [activeItemId, setActiveItemId] = useState<string | null>(null);
   const [assignments, setAssignments] = useState<Record<string, Assignment>>({});
-  const [taxPct, setTaxPct] = useState<number>(DEFAULT_TAX_PCT);
-  const [tipPct, setTipPct] = useState<number>(DEFAULT_TIP_PCT);
-  const [discountAmt, setDiscountAmt] = useState<number>(0);
 
   const addPerson = useCallback((name: string) => {
     if (!name || !name.trim()) return;
@@ -65,26 +59,32 @@ export function useBillState() {
     setPhotoUrl(url);
   }, []);
 
+  // A new receipt scan replaces items from any earlier scan but keeps
+  // anything the user typed in by hand.
   const addItemsFromOcr = useCallback((seed: { name: string; price: number; qty: number }[]) => {
-    if (seed.length === 0) return;
+    const newItems: Item[] = seed.map((it) => ({ id: nextId('i'), ...it, source: 'ocr' }));
     setItems((prevItems) => {
-      if (prevItems.length > 0) return prevItems;
-      const newItems = seed.map((it) => ({ id: nextId('i'), ...it }));
+      const removedIds = prevItems.filter((it) => it.source === 'ocr').map((it) => it.id);
+      const kept = prevItems.filter((it) => it.source !== 'ocr');
       setAssignments((prevAssign) => {
         const next = { ...prevAssign };
+        removedIds.forEach((id) => { delete next[id]; });
         newItems.forEach((it) => {
           next[it.id] = { mode: 'equal', included: people.map((p) => p.id), percents: {} };
         });
         return next;
       });
-      setActiveItemId((prevActive) => prevActive ?? (newItems[0] ? newItems[0].id : prevActive));
-      return newItems;
+      setActiveItemId((prevActive) => {
+        if (prevActive && !removedIds.includes(prevActive)) return prevActive;
+        return newItems[0]?.id ?? kept[0]?.id ?? null;
+      });
+      return [...newItems, ...kept];
     });
   }, [people]);
 
-  const addItem = useCallback(() => {
+  const addItem = useCallback((name: string = 'New item') => {
     const id = nextId('i');
-    const item: Item = { id, name: 'New item', price: 0, qty: 1 };
+    const item: Item = { id, name, price: 0, qty: 1, source: 'manual' };
     setItems((prev) => [...prev, item]);
     setAssignments((prev) => ({ ...prev, [id]: { mode: 'equal', included: people.map((p) => p.id), percents: {} } }));
     setActiveItemId((prev) => prev ?? id);
@@ -138,8 +138,8 @@ export function useBillState() {
   }, []);
 
   const totals = useMemo(
-    () => computeTotals({ people, items, assignments, taxPct, tipPct, discountAmt }),
-    [people, items, assignments, taxPct, tipPct, discountAmt],
+    () => computeTotals({ people, items, assignments }),
+    [people, items, assignments],
   );
 
   const invalidItemIds = useMemo(
@@ -154,9 +154,6 @@ export function useBillState() {
     setItems([]);
     setActiveItemId(null);
     setAssignments({});
-    setTaxPct(DEFAULT_TAX_PCT);
-    setTipPct(DEFAULT_TIP_PCT);
-    setDiscountAmt(0);
   }, []);
 
   return {
@@ -166,7 +163,6 @@ export function useBillState() {
     items, addItemsFromOcr, addItem, updateItem, removeItem,
     activeItemId, setActiveItemId,
     assignments, togglePersonForItem, setMode, setPercent,
-    taxPct, setTaxPct, tipPct, setTipPct, discountAmt, setDiscountAmt,
     totals, invalidItemIds,
     reset,
   };

@@ -6,7 +6,7 @@ export function BottomNav({ step, disabled, onPrev, onNext }: {
   onPrev: () => void;
   onNext: () => void;
 }) {
-  const nextLabel = step === 3 ? 'Start over' : step === 0 ? 'Continue' : step === 1 ? 'Assign people' : 'Review summary';
+  const nextLabel = step === 2 ? 'Start over' : step === 0 ? 'Assign people' : 'Review summary';
   return (
     <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 36 }}>
       <div

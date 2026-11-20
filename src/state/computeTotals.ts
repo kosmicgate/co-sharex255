@@ -6,12 +6,13 @@ function personShare(assignment: Assignment | undefined, personId: string): numb
   return (assignment.percents[personId] || 0) / 100;
 }
 
-export function computeTotals(bill: Pick<BillData, 'people' | 'items' | 'assignments' | 'taxPct' | 'tipPct' | 'discountAmt'>): Totals {
-  const { people, items, assignments, taxPct, tipPct, discountAmt } = bill;
-  const subtotal = items.reduce((sum: number, it: Item) => sum + it.price * it.qty, 0);
-  const taxAmt = subtotal * taxPct / 100;
-  const tipAmt = subtotal * tipPct / 100;
-  const grandTotal = subtotal + taxAmt + tipAmt - discountAmt;
+export function computeTotals(bill: Pick<BillData, 'people' | 'items' | 'assignments'>): Totals {
+  const { people, items, assignments } = bill;
+  // Discounts are entered as items with a negative price.
+  const lineTotals = items.map((it: Item) => it.price * it.qty);
+  const subtotal = lineTotals.filter((v) => v > 0).reduce((a, b) => a + b, 0);
+  const discountTotal = lineTotals.filter((v) => v < 0).reduce((a, b) => a + b, 0);
+  const grandTotal = subtotal + discountTotal;
 
   const perPersonSubtotal: Record<string, number> = {};
   const perPersonItems: Record<string, PersonItemShare[]> = {};
@@ -27,17 +28,10 @@ export function computeTotals(bill: Pick<BillData, 'people' | 'items' | 'assignm
     });
   });
 
-  const extra = taxAmt + tipAmt - discountAmt;
-  const perPersonTotal: Record<string, number> = {};
-  const perPersonExtra: Record<string, number> = {};
-  people.forEach((p) => {
-    const share = subtotal > 0 ? perPersonSubtotal[p.id] / subtotal : 0;
-    perPersonExtra[p.id] = share * extra;
-    perPersonTotal[p.id] = perPersonSubtotal[p.id] + perPersonExtra[p.id];
-  });
+  const perPersonTotal: Record<string, number> = { ...perPersonSubtotal };
 
   return {
-    subtotal, taxPct, tipPct, discountAmt, taxAmt, tipAmt, grandTotal,
-    perPersonTotal, perPersonItems, perPersonExtra,
+    subtotal, discountTotal, grandTotal,
+    perPersonTotal, perPersonItems,
   };
 }

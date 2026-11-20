@@ -15,8 +15,8 @@ export function PeoplePanel({ people, onAdd, onRemove }: {
   };
 
   return (
-    <div style={{
-      width: 280, flex: 'none', background: colors.panel, border: `1.5px solid ${colors.ink}`,
+    <div className="people-panel" style={{
+      width: 280, maxWidth: '100%', boxSizing: 'border-box', flex: 'none', background: colors.panel, border: `1.5px solid ${colors.ink}`,
       borderTop: `4px solid ${colors.orange}`, borderRadius: 8, padding: 20,
       display: 'flex', flexDirection: 'column', gap: 12,
     }}>

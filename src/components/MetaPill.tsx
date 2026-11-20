@@ -13,7 +13,7 @@ export function MetaPill({ peopleCount, itemsCount, subtotalFmt }: { peopleCount
         <span style={{ color: colors.borderDashedAlt }}>|</span>
         <span>{itemsCount}{itemsCount === 1 ? ' ITEM' : ' ITEMS'}</span>
         <span style={{ color: colors.borderDashedAlt }}>|</span>
-        <span>SUBTOTAL {subtotalFmt}</span>
+        <span>TOTAL {subtotalFmt}</span>
       </div>
     </div>
   );
