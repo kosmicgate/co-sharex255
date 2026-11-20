@@ -1,10 +1,9 @@
 import { colors, fonts } from '../theme';
 
 const STEP_META = [
-  { num: '1', title: 'UPLOAD', sub: 'photo + people' },
-  { num: '2', title: 'ITEMS', sub: 'edit line items' },
-  { num: '3', title: 'ASSIGN', sub: 'split each item' },
-  { num: '4', title: 'SUMMARY', sub: 'who owes what' },
+  { num: '1', title: 'ITEMS', sub: 'items + receipt' },
+  { num: '2', title: 'ASSIGN', sub: 'split each item' },
+  { num: '3', title: 'SUMMARY', sub: 'who owes what' },
 ];
 
 export function StepTabs({ step, disabledSteps, onSelect }: {
@@ -40,8 +39,7 @@ export function StepTabs({ step, disabledSteps, onSelect }: {
 }
 
 export const STEP_SUBTITLES = [
-  "Snap the receipt and say who's in.",
-  'Check the line items pulled from your photo.',
+  "Add what you ordered, or scan the receipt.",
   'Tap who had what, then split it.',
   "Here's what everyone owes.",
 ];

@@ -18,7 +18,7 @@ export function Header({ stepNum }: { stepNum: number }) {
         <div style={{ fontFamily: fonts.headline, fontSize: 16, letterSpacing: '0.01em' }}>Co-share</div>
       </div>
       <div style={{ fontFamily: fonts.mono, fontSize: 12, color: colors.mutedLight, letterSpacing: '0.06em' }}>
-        STEP {stepNum} OF 4
+        STEP {stepNum} OF 3
       </div>
     </div>
   );
